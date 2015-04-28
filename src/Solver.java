@@ -17,13 +17,16 @@
  * 8 Puzzle Problem
  * 
  */
-public class Solver{
+public class Solver
+{
 	
 	// The goalStateNode is the Goal State search node when a solution is found
 	private Node goalStateNode;	
 	
 	// Flag to indicate an unsolvable puzzle
 	private boolean isSolvable; 
+	
+	int numberOfEnqueues = 0;
 	
 	/*
 	 * The Node class contains information about the board, number of moves
@@ -35,8 +38,8 @@ public class Solver{
 	private static class Node implements Comparable<Node> 
 	{        
         private final Board board; 
-        private final int moves;       
-        private final Node previousNode;        
+        private final int moves;
+        private final Node previousNode;
         private final int priority;
 
         /*
@@ -70,7 +73,7 @@ public class Solver{
         public int compareTo(Node that) 
         {
         	//StdOut.println("Re-arranging boards based on priority:\n" + this.board + "with\n" + that.board);
-        	StdOut.println("Re-arranging boards based on priority...");
+        	//StdOut.println("Re-arranging boards based on priority...");
             return this.priority - that.priority;
         }
 
@@ -83,7 +86,7 @@ public class Solver{
 	 */
     public Solver(Board initial)
     {
-        StdOut.println("Solver constructor called"); 
+        //StdOut.println("Solver constructor called"); 
         
         // Check to see if the initial board has already been solved
         if(initial.isGoal())
@@ -96,7 +99,7 @@ public class Solver{
         	 * Set the final goalStateNode to a new search node 
         	 * and set it's previousNode search node to null.        	 
         	 */
-        	StdOut.println("Initial board is in goal state");
+        	//StdOut.println("Initial board is in goal state");
         	goalStateNode = new Node(initial, null);
         }
         else
@@ -105,14 +108,14 @@ public class Solver{
         	 * If the initial board is not in its goal state
         	 * start solving the board
         	 */
-        	StdOut.println("Initial board is not in goal state, Solving...");
+        	//StdOut.println("Initial board is not in goal state, Solving...");
         	goalStateNode = solve(initial, initial.twin());
         }
     }
     
     private Node solve(Board initial, Board twin) 
     {    	
-    	StdOut.println("Creating Minimum Priority Queues for Initial and Twin boards");
+    	//StdOut.println("Creating Minimum Priority Queues for Initial and Twin boards");
     	
     	/*
     	 * mainPQ queue used to store the nodes in the tree that have not yet been 
@@ -123,7 +126,7 @@ public class Solver{
         
         /*
          * twinPQ used in the same way as the mainPQ but starts with a twin 
-         * of the initial node. A twin is the initial with two adjecent tiles 
+         * of the initial node. A twin is the initial with two adjacent tiles 
          * swapped. 
          */
         MinPQ<Node> twinPQ = new MinPQ<Node>();
@@ -132,17 +135,17 @@ public class Solver{
         mainPQ.insert(new Node(initial, null));
         twinPQ.insert(new Node(twin, null));
                
-        StdOut.println("Root board in mainPQ is\n" + initial);
-        StdOut.println("Root board in TwinPQ is\n" + twin);
-        StdOut.println("Start loop until we find the goal board....");
+        //StdOut.println("Root board in mainPQ is\n" + initial);
+        //StdOut.println("Root board in TwinPQ is\n" + twin);
+        //StdOut.println("Start loop until we find the goal board....");
                
         /*
          * Loop until the initial board has been solved or the twin board
          * takes the glory, meaning the puzzle cannot be solved.                  
          */
         while (true) 
-        {      
-        	StdOut.println("-----Start of mainQP check");
+        {        	
+        	//StdOut.println("-----Start of mainQP check");
         	// Check the board that has the smallest heuristic value in the main queue
             Node node = nodeWithSmallestHeuristic(mainPQ);
             
@@ -151,14 +154,15 @@ public class Solver{
              *	goal node. If it is we have solved the puzzle!. 
              */
             if (node.board.isGoal())
-            {            	
-            	StdOut.println("Found the board in the mainPQ!!");
+            {
+            	//StdOut.println("Found the board in the mainPQ!!");
             	isSolvable = true;
+            	numberOfEnqueues = mainPQ.size();
                 return node;
-            }   
-                    
-            StdOut.println("-----End of mainQP check");                
-           
+            }
+            
+            //StdOut.println("-----End of mainQP check");
+
             /*
              * 	As described here 
              * 	http://coursera.cs.princeton.edu/algs4/assignments/8puzzle.html
@@ -169,21 +173,22 @@ public class Solver{
              *  so. If the twin of each board with one tile  swapped 
              *  is solvable it means that the other board cannot be solved.   
              */
-            StdOut.println("-----Start of twinPQ check");
-            if(nodeWithSmallestHeuristic(twinPQ).board.isGoal()) {
-            	StdOut.println("The puzzle is not solvable because we solved the twin :( ");
+            //StdOut.println("-----Start of twinPQ check");
+            if(nodeWithSmallestHeuristic(twinPQ).board.isGoal()) 
+            {
+            	//StdOut.println("The puzzle is not solvable because we solved the twin :( ");
                 isSolvable = false;
                 return null;
             }            
-            StdOut.println("-----End of twinPQ check!!");
+            //StdOut.println("-----End of twinPQ check!!");
         }        
     }
     
     private Node nodeWithSmallestHeuristic(MinPQ<Node> priorityQueue)
     {
-    	StdOut.println("Finding the board in the priorityQueue with minimum priority...");
+    	//StdOut.println("Finding the board in the priorityQueue with minimum priority...");
     	Node least = priorityQueue.delMin();
-    	StdOut.println("Least priority board in queue found and removed from priorityQueue is\n" + least.board + "priorityQueue size: " + priorityQueue.size());
+    	//StdOut.println("Least priority board in queue found and removed from priorityQueue is\n" + least.board + "priorityQueue size: " + priorityQueue.size());
     	
     	/*
     	 * For each board that is a neighbour of the least priority board
@@ -201,11 +206,11 @@ public class Solver{
         	 */
             if (least.previousNode == null || !neighbour.equals(least.previousNode.board)) 
             {
-            	StdOut.println(">Adding NEW board to priorityQueue \n" + neighbour);
-            	priorityQueue.insert(new Node(neighbour, least));
+            	//StdOut.println(">Adding NEW board to priorityQueue \n" + neighbour);
+            	priorityQueue.insert(new Node(neighbour, least));            	
             }
         }
-        StdOut.println("priorityQueue size: " + priorityQueue.size());
+        //StdOut.println("priorityQueue size: " + priorityQueue.size());
         
         return least;
     }
@@ -250,15 +255,15 @@ public class Solver{
     }
     
     public static void main(String [] args){
-    	System.out.printf("Solver start\n");
+    	//System.out.printf("Solver start\n");
     	int N = StdIn.readInt();
         int [][] tiles = new int [N][N];      
         
         // Create the 2d array from the values stored on file
         for (int i = 0; i < N; i++){
             for (int j = 0; j < N; j++){
-                tiles[i][j] = StdIn.readInt();                
-            }            
+                tiles[i][j] = StdIn.readInt();
+            }
         }
         
         // Create the initial board
@@ -280,6 +285,7 @@ public class Solver{
         if(!solver.isSolvable())
             System.out.println("No solution possible");
         else
+        	System.out.println("Number of states enqueued = " + solver.numberOfEnqueues);
             System.out.println("Mininimum number of moves = " + solver.moves());
     }
 }
